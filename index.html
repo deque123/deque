@@ -1,258 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmileCraft</title>
+    <title>我的博客 - 单线条跟随效果</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background-color: #0f0f1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             font-family: 'Arial', sans-serif;
-            cursor: none;
-            flex-direction: column;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
         
-        .title {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 5rem;
-            text-shadow: 0 0 10px rgba(100, 149, 237, 0.7);
-            z-index: 10;
-            user-select: none;
-            margin-bottom: 30px;
-        }
-        
-        .button-container {
-            display: flex;
-            gap: 20px;
-            z-index: 10;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(100, 149, 237, 0.7);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(100, 149, 237, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn:hover {
-            background-color: rgba(100, 149, 237, 0.9);
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(100, 149, 237, 0.7);
-        }
-        
-        .btn:active {
-            transform: translateY(1px);
-        }
-        
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-        
-        .btn:focus:not(:active)::after {
-            animation: ripple 0.6s ease-out;
-        }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(20, 20);
-                opacity: 0;
-            }
-        }
-        
-        .triangle {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 10px solid rgba(100, 149, 237, 0.7);
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            animation: fadeOut 0.6s forwards;
-        }
-        
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-            }
-        }
-        
-        /* 背景网格线 */
-        .grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(100, 149, 237, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(100, 149, 237, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        
-        /* 背景闪烁的星星效果 */
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .star {
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: twinkle 2s infinite alternate;
-        }
-        
-        @keyframes twinkle {
-            from { opacity: 0.2; }
-            to { opacity: 1; }
-        }
-        
-        /* 提示信息样式 */
-        .toast {
+        #canvas {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
         
-        .toast.show {
-            opacity: 1;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .content {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
 <body>
-    <div class="grid"></div>
-    <div class="stars" id="stars"></div>
-    <div class="title">SmileCraft</div>
-    <div class="button-container">
-        <button class="btn" id="copyBtn">Copy服务器IP</button>
-        <button class="btn" id="moreBtn">更多</button>
-    </div>
+    <canvas id="canvas"></canvas>
     
-    <div class="toast" id="toast">已复制服务器IP!</div>
-    
-    <script>
-        // 创建星星背景
-        const starsContainer = document.getElementById('stars');
-        const starCount = 100;
+    <div class="container">
+        <header>
+            <h1>欢迎来到我的博客</h1>
+            <p>单线条跟随鼠标效果</p>
+        </header>
         
-        for (let i = 0; i < starCount; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
+        <div class="content">
+            <h2>最新文章</h2>
+            <p>这里是你博客文章的内容...</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置canvas大小为窗口大小
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // 鼠标位置
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        
+        // 线条属性
+        const line = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+            size: 3,
+            history: [],
+            maxHistory: 50
+        };
+        
+        // 监听鼠标移动
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        // 窗口大小改变时重置canvas大小
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // 动画循环
+        function animate() {
+            // 半透明背景用于拖尾效果
+            ctx.fillStyle = 'rgba(245, 245, 245, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // 随机位置和大小
-            const size = Math.random() * 3;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.top = `${Math.random() * 100}%`;
+            // 更新线条位置
+            const dx = mouseX - line.x;
+            const dy = mouseY - line.y;
             
-            // 随机动画延迟
-            star.style.animationDelay = `${Math.random() * 2}s`;
+            line.x += dx * 0.1;
+            line.y += dy * 0.1;
             
-            starsContainer.appendChild(star);
+            // 记录位置历史
+            line.history.push({x: line.x, y: line.y});
+            if (line.history.length > line.maxHistory) {
+                line.history.shift();
+            }
+            
+            // 绘制历史轨迹
+            ctx.beginPath();
+            ctx.moveTo(line.history[0].x, line.history[0].y);
+            for (let i = 1; i < line.history.length; i++) {
+                const point = line.history[i];
+                const prevPoint = line.history[i-1];
+                
+                // 控制点使曲线更平滑
+                const xc = (prevPoint.x + point.x) / 2;
+                const yc = (prevPoint.y + point.y) / 2;
+                ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, xc, yc);
+            }
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.size;
+            ctx.stroke();
+            
+            // 绘制当前点
+            ctx.beginPath();
+            ctx.arc(line.x, line.y, line.size * 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = line.color;
+            ctx.fill();
+            
+            requestAnimationFrame(animate);
         }
         
-        // 鼠标移动时创建三角形
-        document.addEventListener('mousemove', (e) => {
-            const triangle = document.createElement('div');
-            triangle.classList.add('triangle');
-            
-            // 设置三角形位置
-            triangle.style.left = `${e.clientX}px`;
-            triangle.style.top = `${e.clientY}px`;
-            
-            // 随机旋转角度
-            const rotation = Math.random() * 360;
-            triangle.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            
-            // 初始显示
-            triangle.style.opacity = '0.7';
-            
-            document.body.appendChild(triangle);
-            
-            // 0.6秒后移除三角形
-            setTimeout(() => {
-                triangle.remove();
-            }, 600);
-        });
-        
-        // 复制服务器IP按钮功能
-        const copyBtn = document.getElementById('copyBtn');
-        const toast = document.getElementById('toast');
-        
-        copyBtn.addEventListener('click', () => {
-            const ip = 'mc.Smliecraft.cn';
-            navigator.clipboard.writeText(ip).then(() => {
-                // 显示提示信息
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2000);
-            }).catch(err => {
-                console.error('复制失败:', err);
-                // 备用复制方法
-                const textarea = document.createElement('textarea');
-                textarea.value = ip;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                toast.textContent = '已复制服务器IP!';
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2000);
-            });
-        });
-        
-        // 更多按钮功能
-        const moreBtn = document.getElementById('moreBtn');
-        moreBtn.addEventListener('click', () => {
-            window.location.href = '/more.html';
-        });
+        animate();
     </script>
 </body>
 </html>
