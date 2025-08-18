@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>|deque's blog</title>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <!-- Markdown CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             background: #f5f5f5;
-            color: #333;
+            color: #000000;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -23,121 +27,227 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
             z-index: 1;
         }
         
-        header {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
+        .article-container {
+            background-color: rgba(255, 255, 255, 0.92);
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            margin-bottom: 20px;
+            overflow: hidden;
         }
         
-        .content {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            line-height: 1.6;
-            backdrop-filter: blur(5px);
+        .article-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .article-header:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        
+        .article-title {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .toggle-button {
+            font-size: 1.2em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #000;
+        }
+        
+        .article-content {
+            padding: 0 20px;
+            display: none; /* 初始隐藏内容 */
+        }
+        
+        .article-content.markdown-body {
+            padding: 20px;
+        }
+        
+        .article-content.expanded {
+            display: block; /* 展开时显示 */
+        }
+        
+        /* Markdown内容样式 */
+        .markdown-body {
+            color: #000000;
+            background-color: transparent;
+        }
+        
+        .markdown-body pre, 
+        .markdown-body code {
+            background-color: rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     
-    <div class="container">
-        <header>
-            <h1>这是我的博客</h1>
-            <p>很高兴你来看...</p>
-            <p>嘻嘻...</p>
-            <p>耶？你咋还看这...</p>
-            <p>没事，awa</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>O.o</p>
-        </header>
-        
-        <header>
-            <h1>洛谷P1001题解</h1>
-            <p>链接</p>
-        </header>
+    <div class="container" id="blog-container">
+        <!-- 文章将通过JavaScript动态加载 -->
     </div>
 
+    <!-- Marked (Markdown解析器) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.2.12/marked.min.js"></script>
+    <!-- KaTeX JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- DOMPurify (安全渲染HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    
     <script>
+        // 示例文章数据
+        const articles = [
+            {
+                title: "这是我的博客",
+                date: "2025-08-17",
+                content: `
+### 很高兴你来看... 
+
+### 嘻嘻...
+
+### 耶？你咋还看这...
+
+### 没事，awa
+
+\`== std 14 ++\`
+\`== std 23 ++\`
+                `
+            }
+        ];
+
+        // 配置marked
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            highlight: function(code, lang) {
+                return code;
+            }
+        });
+
+        // 渲染文章
+        function renderArticles() {
+            const container = document.getElementById('blog-container');
+            container.innerHTML = '';
+            
+            articles.forEach((article, index) => {
+                const articleId = `article-${index}`;
+                const contentHtml = DOMPurify.sanitize(marked.parse(article.content));
+                
+                const articleElement = document.createElement('div');
+                articleElement.className = 'article-container';
+                articleElement.innerHTML = `
+                    <div class="article-header" onclick="toggleArticle('${articleId}')">
+                        <h2 class="article-title">${article.title}</h2>
+                        <button class="toggle-button">+</button>
+                    </div>
+                    <div class="article-content" id="${articleId}">
+                        <div class="markdown-body">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(articleElement);
+            });
+            
+            // 渲染数学公式
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // 切换文章展开/折叠（无动画）
+        window.toggleArticle = function(articleId) {
+            const content = document.getElementById(articleId);
+            const button = content.previousElementSibling.querySelector('.toggle-button');
+            
+            content.classList.toggle('expanded');
+            button.textContent = content.classList.contains('expanded') ? '-' : '+';
+            
+            // 重新渲染数学公式（解决折叠后公式显示问题）
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(content, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        };
+
+        // 线条跟随效果
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // 设置canvas大小为窗口大小
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        // 鼠标位置
         let mouseX = canvas.width / 2;
         let mouseY = canvas.height / 2;
         
-        // 线条属性
         const line = {
             x: canvas.width / 2,
             y: canvas.height / 2,
-            color: `hsl(${Math.random() * 360}, 80%, 60%)`,
-            size: 3,
+            color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+            size: 2,
             history: [],
-            maxHistory: 50
+            maxHistory: 40
         };
         
-        // 监听鼠标移动
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
         });
         
-        // 窗口大小改变时重置canvas大小
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
         
-        // 动画循环
         function animate() {
-            // 半透明背景用于拖尾效果
             ctx.fillStyle = 'rgba(245, 245, 245, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // 更新线条位置
             const dx = mouseX - line.x;
             const dy = mouseY - line.y;
             
             line.x += dx * 0.1;
             line.y += dy * 0.1;
             
-            // 记录位置历史
             line.history.push({x: line.x, y: line.y});
             if (line.history.length > line.maxHistory) {
                 line.history.shift();
             }
             
-            // 绘制历史轨迹
             ctx.beginPath();
             ctx.moveTo(line.history[0].x, line.history[0].y);
             for (let i = 1; i < line.history.length; i++) {
                 const point = line.history[i];
                 const prevPoint = line.history[i-1];
-                
-                // 控制点使曲线更平滑
                 const xc = (prevPoint.x + point.x) / 2;
                 const yc = (prevPoint.y + point.y) / 2;
                 ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, xc, yc);
@@ -146,7 +256,6 @@
             ctx.lineWidth = line.size;
             ctx.stroke();
             
-            // 绘制当前点
             ctx.beginPath();
             ctx.arc(line.x, line.y, line.size * 1.5, 0, Math.PI * 2);
             ctx.fillStyle = line.color;
@@ -154,10 +263,10 @@
             
             requestAnimationFrame(animate);
         }
-        
+
+        // 初始化
         animate();
+        renderArticles();
     </script>
 </body>
 </html>
-
-
