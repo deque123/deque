@@ -251,12 +251,12 @@
         
         .markdown-body pre, 
         .markdown-body code {
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: rgb(255, 255, 255, 0.2);
         }
         
         .dark-mode .markdown-body pre,
         .dark-mode .markdown-body code {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgb(0, 0, 0, 0.2);
         }
         
         /* 视频容器样式 */
@@ -433,6 +433,7 @@
 \`== std 14 ==\`
 
 \`== std 23 ==\`
+
                 `
             },
             {
@@ -440,7 +441,6 @@
                 date: "2025-08-18",
                 content:`
 ### 只是一个普通的A+B问题...
-
 \`\`\`
 #include<bits/stdc++.h>
 using namespace std;
@@ -449,6 +449,41 @@ int main(){
     ll a, b;//定义变量
     cin>>a>>b;
     cout<<a+b<<'\\n';//'\\n'是换行，用endl也是一样的
+}
+\`\`\`
+                `
+            },
+            {
+                title: "题解-Luogu-P3147",
+                date: "2025-08-20",
+                content:`
+### 倍增模板
+我们可以从两个合并中看出是倍增，
+因此，定义 $ f(i, j) $ 表示当前第 $ i $个位置的合成出第 $ j $个数的位置，
+所以，转移公式为:
+$ f(i, j)=f(f(i, j-1), j-1) $
+\`\`\`
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 5e5 + 10;
+int n, ans;
+int f[N][105];
+int main(){
+	cin>>n;
+	for(int i=1;i<=n;i++){
+		int x;cin>>x;
+    	f[i][x]=i;
+    }
+	for(int i=1;i<=92;i++){
+    	for(int j=1;j<=n;j++){
+    		f[j][i]=f[f[j][i-1]+1][i-1];
+    		if(f[j][i]>0){
+			    ans=i;
+			    continue;
+		    }
+	    }
+    }
+    cout<<ans<<'\\n';
 }
 \`\`\`
                 `
