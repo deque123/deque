@@ -20,6 +20,7 @@
             --hover-bg: rgba(0, 0, 0, 0.03);
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --date-color: #666;
         }
 
         .dark-mode {
@@ -31,6 +32,7 @@
             --hover-bg: rgba(255, 255, 255, 0.05);
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             --sidebar-bg: rgba(40, 40, 40, 0.9);
+            --date-color: #aaa;
         }
 
         /* 进度条样式 */
@@ -58,7 +60,8 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, 
+                         "楷体", "KaiTi", "STKaiti", sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
             min-height: 100vh;
@@ -104,6 +107,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
         }
         
         .header-image::after {
@@ -178,6 +182,7 @@
             font-weight: bold;
             margin: 0 0 10px;
             color: var(--text-color);
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
         }
         
         .profile-bio {
@@ -186,6 +191,7 @@
             margin: 0 0 20px;
             opacity: 0.8;
             font-size: 0.95em;
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
         }
         
         .social-links {
@@ -238,10 +244,22 @@
             background-color: var(--hover-bg);
         }
         
+        .article-title-container {
+            flex: 1;
+        }
+        
         .article-title {
             margin: 0;
             font-size: 1.5em;
             color: var(--text-color);
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
+        }
+        
+        .article-date {
+            font-size: 0.85em;
+            color: var(--date-color);
+            margin-top: 5px;
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
         }
         
         .toggle-button {
@@ -269,11 +287,13 @@
         .markdown-body {
             color: var(--text-color);
             background-color: transparent;
+            font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
         }
         
         .markdown-body pre, 
         .markdown-body code {
             background-color: rgb(255, 255, 255, 0.2);
+            font-family: monospace; /* 代码保持等宽字体 */
         }
         
         .dark-mode .markdown-body pre,
@@ -469,7 +489,7 @@
                 content:`
 ### 只是一个普通的A+B问题...
 \`\`\`
-#include<bits/stdc++.h>
+#include<bits/stdc/stdc.h>
 using namespace std;
 using ll = long long;
 int main(){
@@ -601,7 +621,10 @@ int main(){
                 articleElement.className = 'article-container';
                 articleElement.innerHTML = `
                     <div class="article-header" onclick="toggleArticle('${articleId}')">
-                        <h2 class="article-title">${article.title}</h2>
+                        <div class="article-title-container">
+                            <h2 class="article-title">${article.title}</h2>
+                            <div class="article-date">${article.date}</div>
+                        </div>
                         <button class="toggle-button">+</button>
                     </div>
                     <div class="article-content" id="${articleId}">
