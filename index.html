@@ -33,6 +33,28 @@
             --sidebar-bg: rgba(40, 40, 40, 0.9);
         }
 
+        /* 进度条样式 */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .dark-mode .progress-bar {
+            background: linear-gradient(to right, #ff6b6b 0%, #ffa8a8 100%);
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -369,6 +391,11 @@
     </style>
 </head>
 <body>
+    <!-- 顶部进度条 -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
     <canvas id="canvas"></canvas>
     
     <!-- 顶部图片 -->
@@ -641,6 +668,20 @@ int main(){
             });
         }
 
+        // 进度条功能
+        function initProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            
+            window.addEventListener('scroll', () => {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight - windowHeight;
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                const scrollPercentage = (scrollTop / documentHeight) * 100;
+                progressBar.style.width = scrollPercentage + '%';
+            });
+        }
+
         // 线条跟随效果
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -711,6 +752,7 @@ int main(){
         // 初始化
         initTheme();
         initBackToTop();
+        initProgressBar();
         animate();
         renderArticles();
     </script>
