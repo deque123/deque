@@ -97,7 +97,6 @@
         .header-image {
             width: 100%;
             height: 1050px;
-            background-image: url('https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/497bf94139377ad39592b16b8854c398423517587.png');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -207,7 +206,7 @@
         .social-link {
             width: 35px;
             height: 35px;
-            borderRadius: 50%;
+            border-radius: 50%;
             background: var(--hover-bg);
             display: flex;
             align-items: center;
@@ -471,17 +470,33 @@
             'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/497bf94139377ad39592b16b8854c398423517587.png',
             'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/2d9d74d28582a66c2859c7a5f591b7b4.jpg',
 			'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/8b234f0083435086dbcd01154532c680.jpg'
+
+            // 添加更多图片URL...
         ];
 
-        // 设置随机顶部图片
+        // 设置随机顶部图片（不重复）
         function setRandomHeaderImage() {
             if (headerImages.length === 0) return;
             
-            // 随机选择一个图片
-            const randomIndex = Math.floor(Math.random() * headerImages.length);
-            const randomImageUrl = headerImages[randomIndex];
+            // 获取上一次的图片索引
+            let lastImageIndex = localStorage.getItem('lastHeaderImageIndex');
+            lastImageIndex = lastImageIndex !== null ? parseInt(lastImageIndex) : -1;
+            
+            // 生成新的随机索引（排除上一次的索引）
+            let randomIndex;
+            if (headerImages.length > 1) {
+                do {
+                    randomIndex = Math.floor(Math.random() * headerImages.length);
+                } while (randomIndex === lastImageIndex);
+            } else {
+                randomIndex = 0;
+            }
+            
+            // 保存当前索引
+            localStorage.setItem('lastHeaderImageIndex', randomIndex);
             
             // 设置顶部图片
+            const randomImageUrl = headerImages[randomIndex];
             const headerElement = document.querySelector('.header-image');
             headerElement.style.backgroundImage = `url('${randomImageUrl}')`;
         }
