@@ -110,6 +110,7 @@
             position: relative;
             overflow: hidden;
             font-family: "楷体", "KaiTi", "STKaiti", sans-serif;
+            transition: background-image 0.5s ease-in-out;
         }
         
         .header-image::after {
@@ -206,7 +207,7 @@
         .social-link {
             width: 35px;
             height: 35px;
-            border-radius: 50%;
+            borderRadius: 50%;
             background: var(--hover-bg);
             display: flex;
             align-items: center;
@@ -465,6 +466,26 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
     
     <script>
+        // 顶部图片URL列表 - 请替换为您自己的图片URL
+        const headerImages = [
+            'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/497bf94139377ad39592b16b8854c398423517587.png',
+            'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/2d9d74d28582a66c2859c7a5f591b7b4.jpg',
+			'https://raw.githubusercontent.com/deque123/deque/refs/heads/main/Photo/8b234f0083435086dbcd01154532c680.jpg'
+        ];
+
+        // 设置随机顶部图片
+        function setRandomHeaderImage() {
+            if (headerImages.length === 0) return;
+            
+            // 随机选择一个图片
+            const randomIndex = Math.floor(Math.random() * headerImages.length);
+            const randomImageUrl = headerImages[randomIndex];
+            
+            // 设置顶部图片
+            const headerElement = document.querySelector('.header-image');
+            headerElement.style.backgroundImage = `url('${randomImageUrl}')`;
+        }
+
         // 示例文章数据
         const articles = [
             {
@@ -491,7 +512,7 @@
                 content:`
 ### 只是一个普通的A+B问题...
 \`\`\`
-#include<bits/stdc/stdc.h>
+#include<bits/stdc.h>
 using namespace std;
 using ll = long long;
 int main(){
@@ -778,14 +799,9 @@ int main(){
         initTheme();
         initBackToTop();
         initProgressBar();
+        setRandomHeaderImage(); // 设置随机顶部图片
         animate();
         renderArticles();
     </script>
 </body>
 </html>
-
-
-
-
-
-
